@@ -1,26 +1,17 @@
 {
-    "name": "spatie/laravel-google-calendar",
+    "name": "dvico/google-calendar",
     "description": "Manage events on a Google Calendar",
-    "keywords": [
-        "spatie",
-        "calendar",
-        "google",
-        "event",
-        "schedule",
-        "laravel-google-calendar"
-    ],
-    "homepage": "https://github.com/spatie/laravel-google-calendar",
+
+    "homepage": "https://github.com/dvico/laravel-google-calendar",
     "license": "MIT",
     "authors": [
         {
-            "name": "Freek Van der Herten",
-            "email": "freek@spatie.be",
-            "homepage": "https://spatie.be",
+            "name": "David",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": "^7.0",
+        "php": "^5.6",
         "google/apiclient": "^2.2",
         "illuminate/support": "^5.4.0",
         "nesbot/carbon": "^1.21"
