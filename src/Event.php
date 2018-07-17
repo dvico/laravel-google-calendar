@@ -47,7 +47,7 @@ class Event
      *
      * @return mixed
      */
-    public static function create(array $properties, string $calendarId = null, $optParams = [])
+    public static function create(array $properties, $calendarId = null, $optParams = [])
     {
         $event = new static;
 
@@ -60,7 +60,7 @@ class Event
         return $event->save('insertEvent', $optParams);
     }
 
-    public static function get(Carbon $startDateTime = null, Carbon $endDateTime = null, array $queryParameters = [], string $calendarId = null) : Collection
+    public static function get(Carbon $startDateTime = null, Carbon $endDateTime = null, array $queryParameters = [], $calendarId = null)
     {
         $googleCalendar = static::getGoogleCalendar($calendarId);
 
@@ -82,7 +82,7 @@ class Event
             ->values();
     }
 
-    public static function find($eventId, string $calendarId = null): Event
+    public static function find($eventId, $calendarId = null)
     {
         $googleCalendar = static::getGoogleCalendar($calendarId);
 
@@ -125,19 +125,19 @@ class Event
         array_set($this->googleEvent, $name, $value);
     }
 
-    public function exists(): bool
+    public function exists()
     {
         return $this->id != '';
     }
 
-    public function isAllDayEvent(): bool
+    public function isAllDayEvent()
     {
         return is_null($this->googleEvent['start']['dateTime']);
     }
 
-    public function save(string $method = null, $optParams = []): Event
+    public function save($method = null, $optParams = [])
     {
-        $method = $method ?? ($this->exists() ? 'updateEvent' : 'insertEvent');
+        $method = isset($method) ? $method : ($this->exists() ? 'updateEvent' : 'insertEvent'); //$method ?? ($this->exists() ? 'updateEvent' : 'insertEvent');
 
         $googleCalendar = $this->getGoogleCalendar($this->calendarId);
 
@@ -148,7 +148,7 @@ class Event
         return static::createFromGoogleCalendarEvent($googleEvent, $googleCalendar->getCalendarId());
     }
 
-    public function update(array $attributes, $optParams = []): Event
+    public function update(array $attributes, $optParams = [])
     {
         foreach ($attributes as $name => $value) {
             $this->$name = $value;
@@ -157,9 +157,12 @@ class Event
         return $this->save('updateEvent', $optParams);
     }
 
-    public function delete(string $eventId = null)
+    public function delete($eventId = null)
     {
-        $this->getGoogleCalendar($this->calendarId)->deleteEvent($eventId ?? $this->id);
+        $this->getGoogleCalendar($this->calendarId)->deleteEvent(
+            isset($eventId) ? $eventId : $this->id
+            /*$eventId ?? $this->id*/
+        );
     }
 
     public function addAttendee(array $attendees)
@@ -167,7 +170,7 @@ class Event
         $this->attendees[] = $attendees;
     }
 
-    public function getSortDate(): string
+    public function getSortDate()
     {
         if ($this->startDate) {
             return $this->startDate;
@@ -180,14 +183,14 @@ class Event
         return '';
     }
 
-    protected static function getGoogleCalendar(string $calendarId = null): GoogleCalendar
+    protected static function getGoogleCalendar($calendarId = null)
     {
-        $calendarId = $calendarId ?? config('google-calendar.calendar_id');
+        $calendarId = isset($calendarId) ? $calendarId : config('google-calendar.calendar_id');//$calendarId ?? config('google-calendar.calendar_id');
 
         return GoogleCalendarFactory::createForCalendarId($calendarId);
     }
 
-    protected function setDateProperty(string $name, Carbon $date)
+    protected function setDateProperty($name, Carbon $date)
     {
         $eventDateTime = new Google_Service_Calendar_EventDateTime;
 
@@ -210,8 +213,19 @@ class Event
         }
     }
 
-    protected function getFieldName(string $name): string
+    protected function getFieldName($name)
     {
+        $var = [
+            'name' => 'summary',
+            'description' => 'description',
+            'startDate' => 'start.date',
+            'endDate' => 'end.date',
+            'startDateTime' => 'start.dateTime',
+            'endDateTime' => 'end.dateTime',
+        ];
+
+        return isset($var[$name]) ? $var[$name] : $name;
+        /*
         return [
                    'name' => 'summary',
                    'description' => 'description',
@@ -219,6 +233,6 @@ class Event
                    'endDate' => 'end.date',
                    'startDateTime' => 'start.dateTime',
                    'endDateTime' => 'end.dateTime',
-               ][$name] ?? $name;
+               ][$name] ?? $name;*/
     }
 }
