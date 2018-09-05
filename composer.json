@@ -1,7 +1,7 @@
 {
     "name": "dvico/google-calendar",
     "description": "Manage events on a Google Calendar",
-    "version":"2.3.1",
+    "version":"2.3.2",
     "homepage": "https://github.com/dvico/laravel-google-calendar",
     "license": "MIT",
     "authors": [
